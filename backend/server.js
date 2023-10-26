@@ -11,7 +11,7 @@ import uploadRouter from "./routes/uploadRoutes.js";
 dotenv.config();
 
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect(process.env.MONGODB_URI,{family:4})
   .then(() => {
     console.log("connected to db");
   })
@@ -32,16 +32,15 @@ app.get("/api/keys/google", (req, res) => {
 });
 
 app.use("/api/upload", uploadRouter);
-app.use("/api/seed", seedRouter);
 app.use("/api/products", productRouter);
 app.use("/api/users", userRouter);
 app.use("/api/orders", orderRouter);
 
 const __dirname = path.resolve();
-app.use(express.static(path.join(__dirname, "/frontend/build")));
-app.get("*", (req, res) =>
-  res.sendFile(path.join(__dirname, "/frontend/build/index.html"))
-);
+// app.use(express.static(path.join(__dirname, "/frontend/build")));
+// app.get("*", (req, res) =>
+//   res.sendFile(path.join(__dirname, "/frontend/build/index.html"))
+// );
 
 app.use((err, req, res, next) => {
   res.status(500).send({ message: err.message });

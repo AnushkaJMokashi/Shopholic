@@ -7,6 +7,7 @@ import { isAuth, isAdmin, mailgun, payOrderEmailTemplate } from '../utils.js';
 
 const orderRouter = express.Router();
 
+//get all orders
 orderRouter.get(
   '/',
   isAuth,
@@ -17,6 +18,7 @@ orderRouter.get(
   })
 );
 
+//add new order
 orderRouter.post(
   '/',
   isAuth,
@@ -26,7 +28,7 @@ orderRouter.post(
       shippingAddress: req.body.shippingAddress,
       paymentMethod: req.body.paymentMethod,
       itemsPrice: req.body.itemsPrice,
-      shippingPrice: req.body.shippingPrice,
+      shippingPrice: req.body.shippingPrice,    
       taxPrice: req.body.taxPrice,
       totalPrice: req.body.totalPrice,
       user: req.user._id,
@@ -37,6 +39,7 @@ orderRouter.post(
   })
 );
 
+//summary of orders for admin
 orderRouter.get(
   '/summary',
   isAuth,
@@ -81,6 +84,7 @@ orderRouter.get(
   })
 );
 
+//user's routes
 orderRouter.get(
   '/mine',
   isAuth,
@@ -90,6 +94,7 @@ orderRouter.get(
   })
 );
 
+//get order by id
 orderRouter.get(
   '/:id',
   isAuth,
@@ -103,6 +108,7 @@ orderRouter.get(
   })
 );
 
+//After delivering the order
 orderRouter.put(
   '/:id/deliver',
   isAuth,
@@ -119,6 +125,7 @@ orderRouter.put(
   })
 );
 
+//After making payment
 orderRouter.put(
   '/:id/pay',
   isAuth,
@@ -133,28 +140,10 @@ orderRouter.put(
       order.paymentResult = {
         id: req.body.id,
         status: req.body.status,
-        update_time: req.body.update_time,
-        email_address: req.body.email_address,
       };
 
       const updatedOrder = await order.save();
-      mailgun()
-        .messages()
-        .send(
-          {
-            from: 'Amazona <amazona@mg.yourdomain.com>',
-            to: `${order.user.name} <${order.user.email}>`,
-            subject: `New order ${order._id}`,
-            html: payOrderEmailTemplate(order),
-          },
-          (error, body) => {
-            if (error) {
-              console.log(error);
-            } else {
-              console.log(body);
-            }
-          }
-        );
+
 
       res.send({ message: 'Order Paid', order: updatedOrder });
     } else {
@@ -163,6 +152,7 @@ orderRouter.put(
   })
 );
 
+//Delete Order
 orderRouter.delete(
   '/:id',
   isAuth,
